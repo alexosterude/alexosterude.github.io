@@ -16,24 +16,30 @@
 $(document).ready(function(){
     $(".navbar .nav-link").on('click', function(event) {
 
-        if (this.hash !== "") {
+        if (this.hash !== "" && $(this.hash).length) {
 
             event.preventDefault();
 
             var hash = this.hash;
+            var navHeight = $(".navbar.fixed-top").outerHeight() || 0;
 
             $('html, body').animate({
-                scrollTop: $(hash).offset().top
+                scrollTop: $(hash).offset().top - navHeight
             }, 700, function(){
-                window.location.hash = hash;
+                // update the url without jumping past the navbar offset
+                history.pushState(null, "", hash);
             });
-        } 
+        }
     });
+
+    // footer year
+    $(".js-year").text(new Date().getFullYear());
 });
 
-// protfolio filters
+// portfolio filters
 $(window).on("load", function() {
     var t = $(".portfolio-container");
+    if (!t.length || !$.fn.isotope) return;
     t.isotope({
         filter: ".new",
         animationOptions: {
@@ -41,7 +47,7 @@ $(window).on("load", function() {
             easing: "linear",
             queue: !1
         }
-    }), $(".filters a").click(function() {
+    }), $(".filters a").on("click", function() {
         $(".filters .active").removeClass("active"), $(this).addClass("active");
         var i = $(this).attr("data-filter");
         return t.isotope({
